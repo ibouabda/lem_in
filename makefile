@@ -5,80 +5,71 @@
 #                                                     +:+ +:+         +:+      #
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/02/11 17:46:29 by idris             #+#    #+#              #
-#    Updated: 2022/02/15 14:24:35 by gperez           ###   ########.fr        #
+#    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
+#    Updated: 2022/02/15 15:15:06 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-### COMPILATION ###
-
-CC = gcc
-
-CFLAGS = -Wall -Werror -Wextra
-
-### EXECUTABLE ###
-
 NAME = lem_in
 
-### INCLUDES ###
+FLAG = -Wall -Werror -Wextra -g
 
-SRC_NAME = main.c \
+SRC =	srcs/main.c \
 
-SRC_PATH = srcs
-OBJ_PATH = objs
-HEADER = incl
-LIBFT = libft
+NC = \033[0m
+BOLD =\033[1m
+DIM =\033[2m
+ITALIC =\033[3m
+UNDER =\033[4m
+BLINK =\033[5m
 
-### OBJECTS ###
+RS_BO = \033[21m
+RS_D = \033[22m
+RS_I = \033[23m
+RS_U =\033[24m
+RS_BL = \033[25m
 
-SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
-OBJS = $(addprefix $(OBJ_PATH)/,$(SRC_NAME:.c=.o))
+WHITE = \033[37m
+BLUE = \033[38;5;37m
+CYAN = \033[38;5;117m
+GREEN = \033[38;5;120m
+MAGENTA = \033[38;5;135m
+RED = \033[38;5;203m
 
+COLOR1 = \033[38;5;75m
+COLOR2 = \033[38;5;178m
 
-### COLORS ###
+LIB_L = libft/libft.a
 
-NOC         = \033[0m
-BOLD        = \033[1m
-UNDERLINE   = \033[4m
-BLACK       = \033[1;30m
-RED         = \033[1;31m
-GREEN       = \033[1;32m
-YELLOW      = \033[1;33m
-BLUE        = \033[1;34m
-VIOLET      = \033[1;35m
-CYAN        = \033[1;36m
-WHITE       = \033[1;37m
+LIBS_H =	libft/incl \
+			incl \
 
-### RULES ###
+LIBS = $(addprefix -I,$(LIBS_H))
 
-all: tmp $(NAME)
+INC =	incl/lem_in.h \
 
-$(NAME): $(OBJS)
-	@make -C $(LIBFT)
-	@echo "$(GREEN)Project compiling ...$(NOC)"
-	@$(CC) $(CFLAGS) -L $(LIBFT) -o $@ $^  libft/libft.a
-	@echo "$(GREEN)Project successfully compiled !$(NOC)"
+OBJ = $(SRC:.c=.o)
 
-tmp:
-	@mkdir -p $(OBJ_PATH)
+all : $(NAME)
 
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(HEADER)/$(NAME).h
-	@$(CC) $(CFLAGS) -I $(HEADER) -c -o $@ $<
+$(LIB_L) :
+	@make -C libft
 
+$(NAME) : $(LIB_L) $(OBJ)
+	@g++ $(FLAG) $^ -o $(NAME)
+	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BL)$(RS_BO)$(GREEN)succesfuly made!$(NC)%20s\n" $(NAME)
 
-clean:
-	@echo "$(RED)Supressing ...$(NOC)"
-	@make clean -C $(LIBFT)
-	@rm -rf $(OBJ_PATH)
-	@echo "$(RED)Object files suppressed$(NOC)"
+%.o : %.c $(INC)
+	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BO)$(COLOR2)%20s$(WHITE) ...$(NC)" $(NAME) $(<F)
+	@gcc $(FLAG) $(LIBS) -o $@ -c $<
+	@printf "\r"
 
-fclean:
-	@echo "$(RED)Supressing ...$(NOC)"
-	@rm -rf $(OBJ_PATH)
-	@rm -rf $(NAME)
-	@make fclean -C $(LIBFT)
-	@echo "$(RED)Files suppressed$(NOC)"
+clean :
+	@make -C libft clean
+	@/bin/rm -rf srcs/*.o
 
-re: fclean all
+fclean : clean
+	@/bin/rm -rf $(NAME)
+	@/bin/rm -rf $(LIB_L)
 
-.phony: all, tmp, re, fclean, clean
+re : fclean all

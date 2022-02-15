@@ -1,7 +1,7 @@
-# include "libft.h"
+# include "lem_in.h"
 
 int	main(void)
 {
-	ft_putend("Truc");
+	ft_putendl("Truc");
 	return (1);
 }
