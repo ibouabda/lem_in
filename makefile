@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ibouabda <ibouabda@42.students.fr>         +#+  +:+       +#+         #
+#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/02/11 17:46:29 by idris             #+#    #+#              #
-#    Updated: 2022/02/15 13:38:42 by ibouabda         ###   ########.fr        #
+#    Updated: 2022/02/15 14:24:35 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,9 +22,8 @@ NAME = lem_in
 
 ### INCLUDES ###
 
-SRC_NAME = main.c ft_parse_map.c ft_parse_map2.c read_param.c mlx_img.c\
-			display_column.c check_texture.c key_hook.c \
-			calcul_ray.c print_texture.c dda.c
+SRC_NAME = main.c \
+
 SRC_PATH = srcs
 OBJ_PATH = objs
 HEADER = incl
