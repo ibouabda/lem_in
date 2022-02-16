@@ -1,1 +1,5 @@
 objs/*.o
+libft/objs/*.o
+lem_in
+libft/libft.a
+*.o
