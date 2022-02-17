@@ -33,12 +33,6 @@ void	each_round(t_env *env, t_ant_list *ant_list, char *at_least_an_ant_move)
 	}
 }
 
-char	parse(t_env *env) // boolean
-{
-	(void)env;
-	return (0);
-}
-
 /******************************************/
 /*	Tant que le programme n'est pas fini */
 /*		Execute les rounds*/
@@ -61,12 +55,15 @@ int		main(void)
 	t_ant_list	*ant_list;
 	char		at_least_an_ant_move;
 
-	env = (t_env){NULL, NULL, NULL, NULL, 0, 0};
+	ft_bzero(&env, sizeof(t_env));
 	ant_list = NULL;
 	at_least_an_ant_move = 0;
 
-	if (parse(&env)) // Erreur durant le parsing
+	if (parse(&env) || !env.ant_nbr) // Erreur durant le parsing
 		return (1);
+	ft_putendl("Nombre de fourmis: ");
+	ft_putnbr((int)env.ant_nbr);
+	ft_putchar('\n');
 	while (!env.finish)
 	{
 		env.end_round = 0;

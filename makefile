@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2022/02/15 15:15:06 by gperez           ###   ########.fr        #
+#    Updated: 2022/02/17 18:51:34 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,9 @@ NAME = lem_in
 FLAG = -Wall -Werror -Wextra -g
 
 SRC =	srcs/main.c \
+		srcs/parser.c \
+		srcs/parse_room.c \
+		srcs/parse_pipe.c \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -47,6 +50,7 @@ LIBS_H =	libft/incl \
 LIBS = $(addprefix -I,$(LIBS_H))
 
 INC =	incl/lem_in.h \
+		incl/parse.h \
 
 OBJ = $(SRC:.c=.o)
 
