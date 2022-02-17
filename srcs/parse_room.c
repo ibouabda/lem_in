@@ -1,6 +1,6 @@
 # include "lem_in.h"
 
-static t_room_list	*allocate_room_list(char *name, int coord_x, int coord_y)
+static t_room_list	*allocate_room_list(char *name, char *coord_x, char *coord_y)
 {
 	t_room		*room;
 	t_room_list	*room_link;
@@ -8,20 +8,20 @@ static t_room_list	*allocate_room_list(char *name, int coord_x, int coord_y)
 	size_t		room_link_size;
 
 	room_size = sizeof(t_room); // Alloue la room
-	if (!(room = (t_room*)ft_memalloc(room_size))
+	if (!(room = (t_room*)ft_memalloc(room_size)))
 		return (NULL);
 	ft_bzero(room, room_size);
 	if (!(room->name = ft_strnew_cpy(name)))
 	{
-		ft_memdel(&room);
+		ft_memdel((void**)&room);
 		return (NULL);
 	}
-	room->coord_x = coord_x;
-	room->coord_y = coord_y;
+	room->coord_x = atoi(coord_x);
+	room->coord_y = atoi(coord_y);
 	room_link_size = sizeof(t_room_list); // Alloue la room_list
-	if (!(room_link = (t_room_list*)ft_memalloc(room_link_size))
+	if (!(room_link = (t_room_list*)ft_memalloc(room_link_size)))
 	{
-		ft_memdel(&room);
+		ft_memdel((void**)&room);
 		return (NULL);
 	}
 	room_link->room = room;
@@ -65,13 +65,14 @@ char				get_room(t_env *env, char *line, t_room_list *last_room,
 	int			nb_str_in_split = 0;
 	char		ret = 0;
 
-	split = ft_strsplit(line, ' ');
+	if (!(split = ft_strsplit(line, ' ')))
+		return (1);
 	while (split[i_split++])
 		nb_str_in_split++;
 	if (nb_str_in_split == 1) // C'est que l'on a switch sur les pipes
 	{
-		*bool_parse->step_frp = 1;
-		ret = get_pipe(env, split[1]);
+		bool_parse->step_frp = 1;
+		ret = get_pipe(env, split[0]);
 	}
 	else if (nb_str_in_split == 3) // Si on a le bon nombre
 		ret = fill_room(env, split, last_room, &(bool_parse->is_start_is_end));

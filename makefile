@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2022/02/17 20:31:02 by gperez           ###   ########.fr        #
+#    Updated: 2022/02/17 22:03:46 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,8 @@ SRC =	srcs/main.c \
 		srcs/parse_room.c \
 		srcs/parse_pipe.c \
 		srcs/erase_anthill.c \
+		srcs/alloc_ants.c \
+		srcs/ft_strnew_cpy.c \
 
 NC = \033[0m
 BOLD =\033[1m

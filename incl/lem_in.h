@@ -55,9 +55,10 @@ char					parse(t_env *env);
 char					get_room(t_env *env, char *line, t_room_list *last_room,
 	t_bool_parse *bool_parse);
 char					get_pipe(t_env *env, char *line);
+char					alloc_ants(t_env *env);
 
 char					ant_can_move(t_ant *ant);
 void					each_round(t_env *env, t_ant_list *ant_list, char *at_least_an_ant_move);
 
-void					erase_anthills(t_env *env);
+void					erase_anthill(t_env *env);
 #endif
