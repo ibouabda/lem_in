@@ -75,5 +75,6 @@ int		main(void)
 		if (!at_least_an_ant_move || (env.end_round == 1 && ant_list == env.ants)) // Aucune fourmi ne peut bouger || La premiere fourmi ne peut pas sortir = ERREUR
 			env.finish = 1;
 	}
+	erase_anthill(&env);
 	return (1);
 }

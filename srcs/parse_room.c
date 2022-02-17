@@ -1,6 +1,6 @@
 # include "lem_in.h"
 
-static t_room_list	*allocate_room(char *name, int coord_x, int coord_y)
+static t_room_list	*allocate_room_list(char *name, int coord_x, int coord_y)
 {
 	t_room		*room;
 	t_room_list	*room_link;
@@ -8,7 +8,8 @@ static t_room_list	*allocate_room(char *name, int coord_x, int coord_y)
 	size_t		room_link_size;
 
 	room_size = sizeof(t_room); // Alloue la room
-	room = (t_room*)ft_memalloc(room_size);
+	if (!(room = (t_room*)ft_memalloc(room_size))
+		return (NULL);
 	ft_bzero(room, room_size);
 	if (!(room->name = ft_strnew_cpy(name)))
 	{
@@ -18,7 +19,11 @@ static t_room_list	*allocate_room(char *name, int coord_x, int coord_y)
 	room->coord_x = coord_x;
 	room->coord_y = coord_y;
 	room_link_size = sizeof(t_room_list); // Alloue la room_list
-	room_link = (t_room_list*)ft_memalloc(room_link_size);
+	if (!(room_link = (t_room_list*)ft_memalloc(room_link_size))
+	{
+		ft_memdel(&room);
+		return (NULL);
+	}
 	room_link->room = room;
 	room_link->next = NULL;
 	return (room_link);
@@ -30,7 +35,7 @@ static char			fill_room(t_env *env, char **split, t_room_list *last_room,
 	t_room_list	*room_link = NULL;
 	char		ret = 0;
 
-	room_link = allocate_room(split[0], split[1], split[2]);
+	room_link = allocate_room_list(split[0], split[1], split[2]);
 	if (!last_room) // Si la room est la premiere de la liste
 		env->rooms = room_link;
 	else
@@ -52,7 +57,7 @@ static char			fill_room(t_env *env, char **split, t_room_list *last_room,
 	return (ret);
 }
 
-char				get_room(t_env *env, char **line, t_room_list *last_room,
+char				get_room(t_env *env, char *line, t_room_list *last_room,
 	t_bool_parse *bool_parse)
 {
 	char		**split = NULL;
@@ -64,9 +69,12 @@ char				get_room(t_env *env, char **line, t_room_list *last_room,
 	while (split[i_split++])
 		nb_str_in_split++;
 	if (nb_str_in_split == 1) // C'est que l'on a switch sur les pipes
-		ret = get_pipe(env, split[1], &(bool_parse->step_frp));
+	{
+		*bool_parse->step_frp = 1;
+		ret = get_pipe(env, split[1]);
+	}
 	else if (nb_str_in_split == 3) // Si on a le bon nombre
-		ret = fill_room(env, split, last_room, &(bool_parse.is_start_is_end));
+		ret = fill_room(env, split, last_room, &(bool_parse->is_start_is_end));
 	else
 		ret = 1;
 	ft_2dstrdel(split);

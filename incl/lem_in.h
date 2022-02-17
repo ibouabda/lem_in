@@ -45,16 +45,19 @@ typedef struct			s_env
 
 char					*ft_strnew_cpy(char *str);
 
-char					parse(t_env *env);
-char					get_room(t_env *env, char **line, t_room_list *last_room,
-	t_bool_parse *bool_parse);
-
 typedef struct			s_bool_parse
 {
 	char	step_frp;			// 0	|	first_line_step	|	room_step	|	pipe_step
 	char	is_start_is_end;	// 0	|			0 		|	is_start	|	is_end
 }						t_bool_parse;
 
+char					parse(t_env *env);
+char					get_room(t_env *env, char *line, t_room_list *last_room,
+	t_bool_parse *bool_parse);
+char					get_pipe(t_env *env, char *line);
+
 char					ant_can_move(t_ant *ant);
 void					each_round(t_env *env, t_ant_list *ant_list, char *at_least_an_ant_move);
+
+void					erase_anthills(t_env *env);
 #endif
