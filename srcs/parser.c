@@ -20,9 +20,9 @@ static char			check_command(char *line, char *is_start_is_end)
 			nb_str_in_split++;
 		if (nb_str_in_split != 1)
 			(void)nb_str_in_split;
-		else if (!ft_strcmp(line, "start"))
+		else if (!ft_strcmp(line, "##start"))
 			*is_start_is_end = 1 << 1; // start 1
-		else if (!ft_strcmp(line, "end"))
+		else if (!ft_strcmp(line, "##end"))
 			*is_start_is_end = 1; // end 1
 		ft_2dstrdel(split);
 		return (1);
@@ -41,9 +41,10 @@ char				parse(t_env *env) // boolean
 	t_bool_parse	bool_parse = (t_bool_parse){0, 0}; // Ce sont des char cast en booleans
 	char			*line = NULL;
 	t_room_list		*last_room = NULL;
+	int				check = 0;
 
 	bool_parse.step_frp = 1 << 2; // first_line_step = 1
-	while (get_next_line(0, &line) && line != NULL) // Entree standard
+	while ((check = get_next_line(0, &line)) > 0) // Entree standard
 	{
 		ft_putendl(line);
 		if (bool_parse.step_frp == 4)
@@ -52,16 +53,20 @@ char				parse(t_env *env) // boolean
 		{
 			if (check_command(line, &(bool_parse.is_start_is_end)))
 				(void)line;
-			else if (((bool_parse.step_frp == 2) && get_room(env, line, last_room, &bool_parse))
+			else if (((bool_parse.step_frp == 2) && get_room(env, line, &last_room, &bool_parse))
 				|| ((bool_parse.step_frp == 1) && get_pipe(env, line)))
 			{
 				ft_strdel(&line);
+				ft_putendl(RED"Probleme lors du parsing"NA);
 				return (1);
 			}
 		}
 		ft_strdel(&line);
 	}
-	if (!env->start || alloc_ants(env))
+	if (check == -1 || alloc_ants(env) || !env->start)
+	{
+		ft_putendl(RED"Probleme lors du parsing"NA);
 		return (1);
+	}
 	return (0);
 }

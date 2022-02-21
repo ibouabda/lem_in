@@ -33,6 +33,63 @@ void	each_round(t_env *env, t_ant_list *ant_list, char *at_least_an_ant_move)
 	}
 }
 
+static void	print_room(t_room *room)
+{
+	t_room_list	*links = NULL;
+	t_room		*room_link = NULL;
+
+	ft_putstr("Room name: ");
+	if (room->name)
+		ft_putendl(room->name);
+	else
+		ft_putendl("No name in room");
+	links = room->link;
+	while (links)
+	{
+		ft_putstr("Link to: ");
+		room_link = links->room;
+		if (room_link)
+		{
+			ft_putstr(room_link->name);
+			ft_putstr(" | ");
+		}
+		links = links->next;
+	}
+	ft_putstr("\n\n\n");
+}
+
+static void	print_rooms(t_room_list *rooms)
+{
+	t_room		*room = NULL;
+
+	while (rooms)
+	{
+		if ((room = rooms->room))
+			print_room(rooms->room);
+		else
+			ft_putendl("No room in roomList");
+		rooms = rooms->next;
+	}
+}
+
+static void	print(t_room *start_end, const char *msg)
+{
+	if (!start_end)
+		ft_putendl(msg);
+	else
+		print_room(start_end);
+}
+
+static void	print_start_end(t_room *start, t_room *end)
+{
+	ft_putendl(GREEN"Start room:");
+	print(start, RED"There is no start room"NA);
+	ft_putendl("End room:");
+	print(end, RED"There is no end room"NA);
+	ft_putendl(NA);
+}
+
+
 /******************************************/
 /*	Tant que le programme n'est pas fini */
 /*		Execute les rounds*/
@@ -61,20 +118,22 @@ int		main(void)
 
 	if (parse(&env) || !env.ant_nbr) // Erreur durant le parsing
 		return (1);
-	ft_putendl("Nombre de fourmis: ");
+	ft_putendl(YELLOW"\nNombre de fourmis: ");
 	ft_putnbr((int)env.ant_nbr);
-	ft_putchar('\n');
-	while (!env.finish)
-	{
-		env.end_round = 0;
-		ant_list = env.ants;
-		if (ant_list == NULL) // Si la liste de fourmi est NULL
-			return (1);
-		at_least_an_ant_move = 0;
-		each_round(&env, ant_list, &at_least_an_ant_move); // Un round
-		if (!at_least_an_ant_move || (env.end_round == 1 && ant_list == env.ants)) // Aucune fourmi ne peut bouger || La premiere fourmi ne peut pas sortir = ERREUR
-			env.finish = 1;
-	}
+	ft_putendl(NA"\n");
+	// while (!env.finish)
+	// {
+	// 	env.end_round = 0;
+	// 	ant_list = env.ants;
+	// 	if (ant_list == NULL) // Si la liste de fourmi est NULL
+	// 		return (1);
+	// 	at_least_an_ant_move = 0;
+	// 	each_round(&env, ant_list, &at_least_an_ant_move); // Un round
+	// 	if (!at_least_an_ant_move || (env.end_round == 1 && ant_list == env.ants)) // Aucune fourmi ne peut bouger || La premiere fourmi ne peut pas sortir = ERREUR
+	// 		env.finish = 1;
+	// }
+	print_rooms(env.rooms);
+	print_start_end(env.start, env.end);
 	erase_anthill(&env);
 	return (1);
 }

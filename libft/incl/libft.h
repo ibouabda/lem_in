@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibouabda <ibouabda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/11 15:22:12 by ibouabda          #+#    #+#             */
-/*   Updated: 2020/02/01 18:53:23 by ibouabda         ###   ########.fr       */
+/*   Updated: 2022/02/18 12:55:02 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,5 +169,21 @@ int					*ft_intnew_clean(int size);
 int					ft_2dstrchr(char **str, char c, t_fpoint *a);
 int					ft_abs(int value);
 int					ft_bool(int value);
+
+typedef struct	s_ret
+{
+	int		ret;
+	int		len_line;
+	int		clonefd;
+	int		buf_too_small;
+}				t_ret;
+
+typedef struct	s_stat
+{
+	int				fd;
+	char			*buf_static;
+	struct s_stat	*save;
+	struct s_stat	*next;
+}				t_stat;
 
 #endif

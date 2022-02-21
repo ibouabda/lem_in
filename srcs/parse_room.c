@@ -29,18 +29,18 @@ static t_room_list	*allocate_room_list(char *name, char *coord_x, char *coord_y)
 	return (room_link);
 }
 
-static char			fill_room(t_env *env, char **split, t_room_list *last_room,
+static char			fill_room(t_env *env, char **split, t_room_list **last_room,
 	char *bool_is_start_is_end)
 {
 	t_room_list	*room_link = NULL;
 	char		ret = 0;
 
 	room_link = allocate_room_list(split[0], split[1], split[2]);
-	if (!last_room) // Si la room est la premiere de la liste
+	if (!(*last_room)) // Si la room est la premiere de la liste
 		env->rooms = room_link;
 	else
-		last_room->next = room_link;
-	last_room = room_link;
+		(*last_room)->next = room_link;
+	*last_room = room_link;
 	if ((*bool_is_start_is_end == 2 && env->start)
 		|| (*bool_is_start_is_end == 1 && env->end)) // S'il y a plusieurs start ou end
 		ret = 1;
@@ -57,7 +57,7 @@ static char			fill_room(t_env *env, char **split, t_room_list *last_room,
 	return (ret);
 }
 
-char				get_room(t_env *env, char *line, t_room_list *last_room,
+char				get_room(t_env *env, char *line, t_room_list **last_room,
 	t_bool_parse *bool_parse)
 {
 	char		**split = NULL;
@@ -70,10 +70,7 @@ char				get_room(t_env *env, char *line, t_room_list *last_room,
 	while (split[i_split++])
 		nb_str_in_split++;
 	if (nb_str_in_split == 1) // C'est que l'on a switch sur les pipes
-	{
 		bool_parse->step_frp = 1;
-		ret = get_pipe(env, split[0]);
-	}
 	else if (nb_str_in_split == 3) // Si on a le bon nombre
 		ret = fill_room(env, split, last_room, &(bool_parse->is_start_is_end));
 	else

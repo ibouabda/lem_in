@@ -3,116 +3,141 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibouabda <ibouabda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/15 15:31:27 by ibouabda          #+#    #+#             */
-/*   Updated: 2019/10/10 20:01:37 by ibouabda         ###   ########.fr       */
+/*   Updated: 2022/02/18 13:00:52 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incl/libft.h"
 #include "stdio.h"
 
-t_prlist	*ft_prlistnewstr(char *content, int fd, t_prlist *prev)
+static t_stat	*ft_creat_list(t_ret *ret, t_stat **stat, t_stat *save, int *n)
 {
-	t_prlist	*newlist;
+	t_stat	*new;
 
-	if (!(newlist = (t_prlist *)malloc(sizeof(t_prlist))))
+	if (n != NULL)
+		*n = 1;
+	(*ret) = (t_ret){2, 0, ret->clonefd, 0};
+	if (!(new = (t_stat*)ft_memalloc(sizeof(t_stat))))
 		return (NULL);
-	if (content == NULL)
+	new->fd = ret->clonefd;
+	new->buf_static = NULL;
+	new->next = NULL;
+	if (*stat == NULL)
 	{
-		newlist->content = NULL;
-		fd = 0;
+		new->save = new;
+		*stat = new;
 	}
 	else
-	{
-		newlist->content = content;
-		newlist->fd = fd;
-	}
-	newlist->prev = prev;
-	newlist->next = NULL;
-	return (newlist);
+		new->save = save;
+	return (new);
 }
 
-void		takeline(char *buf, char **line)
+static t_stat	*ft_lst(t_ret *ret, t_stat *stat, t_stat *save)
 {
-	int		i;
-	size_t	size;
+	int		crea;
 
-	i = 0;
-	while (buf[i] && buf[i] != '\n')
-		i++;
-	*line = ft_strsub(buf, 0, i);
-	size = ft_strlen(buf);
-	ft_memmove(buf, buf + (i + 1), size - i);
-	buf[size - i] = '\0';
+	crea = 0;
+	ret->len_line = 0;
+	ret->buf_too_small = 0;
+	ret->ret = 2;
+	if (stat->fd != ret->clonefd)
+	{
+		stat = save;
+		while (stat->fd != ret->clonefd && stat->next != NULL)
+			stat = stat->next;
+		if (stat->fd != ret->clonefd && stat->next == NULL)
+		{
+			stat->next = ft_creat_list(ret, &stat, save, &crea);
+			stat = stat->next;
+		}
+	}
+	return (stat);
 }
 
-void		ft_chooseid(t_prlist **id, const int fd)
+static int		ft_malloc_line(int cmpt, t_ret r, const char *buf, char **line)
 {
-	while ((*id)->prev)
-		(*id) = (*id)->prev;
-	while ((*id)->next && (*id)->fd != fd)
-		(*id) = (*id)->next;
-	if ((*id) && (*id)->fd != fd)
-	{
-		(*id)->next = ft_prlistnewstr(ft_strnew(0), fd, (*id));
-		(*id) = (*id)->next;
-	}
-}
+	char	*save;
+	int		cmpt_s;
+	int		cmpt_p;
 
-int			ft_prlstdellink(t_prlist **id)
-{
-	t_prlist **m;
-
-	m = id;
-	if ((*id)->prev && (*id)->next)
-	{
-		(*id)->prev->next = (*id)->next;
-		(*id)->next->prev = (*id)->prev;
-		(*id) = (*id)->prev;
-	}
-	else if ((*id)->next)
-	{
-		(*id) = (*id)->next;
-		(*id)->prev = NULL;
-	}
-	else if ((*id)->prev)
-	{
-		(*id) = (*id)->prev;
-		(*id)->next = NULL;
-	}
-	if ((*m)->content)
-		ft_memdel((void**)&((*m)->content));
-	ft_memdel((void**)m);
-	return (0);
-}
-
-int			get_next_line(const int fd, char **line)
-{
-	static t_prlist	*id;
-	char			*buftmp;
-	char			*todel;
-	int				red;
-
-	red = -1;
-	buftmp = ft_strnew(BUFF_SIZE + 1);
-	if (!line || (read(fd, buftmp, 0)) == -1)
+	cmpt_p = 0;
+	cmpt_s = 0;
+	if ((save = ft_strnew((size_t)r.len_line +
+		(size_t)(cmpt - cmpt_p))) == NULL)
 		return (-1);
-	id = !id ? ft_prlistnewstr(ft_strnew(0), fd, NULL) : id;
-	if (id->fd != fd)
-		ft_chooseid(&id, fd);
-	while (!ft_strchr(id->content, '\n') &&
-	(red = read(id->fd, buftmp, BUFF_SIZE)))
+	if (r.buf_too_small == 1)
 	{
-		buftmp[red] = '\0';
-		todel = id->content;
-		id->content = ft_strjoin(todel, buftmp);
-		ft_strdel(&todel);
+		if (r.len_line > 0)
+		{
+			ft_strcpy(save, *line);
+			cmpt_s = (int)ft_strlen(*line);
+		}
+		ft_strdel(line);
 	}
-	ft_strdel(&buftmp);
-	takeline(id->content, line);
-	if (red == 0 && !((char *)id->content)[0])
-		return (ft_prlstdellink(&id));
+	while (cmpt_p < cmpt)
+	{
+		save[cmpt_s++] = buf[cmpt_p++];
+	}
+	save[cmpt_s] = '\0';
+	*line = save;
+	return ((int)ft_strlen(*line));
+}
+
+static int		sub_get_next_line(t_ret *r, t_stat *s, char *buf, char **line)
+{
+	int		cmpt;
+
+	cmpt = 0;
+	if (r->ret == 0)
+		return (0);
+	while (buf[cmpt] != '\n' && buf[cmpt] != '\0')
+		cmpt++;
+	r->len_line = ft_malloc_line(cmpt, *r, buf, line);
+	if (s->buf_static != NULL)
+		ft_strdel(&s->buf_static);
+	if ((s->buf_static = ft_strnew(ft_strlen(buf + cmpt + 1))) == NULL)
+		return (-1);
+	if (buf[cmpt] != '\n')
+	{
+		r->buf_too_small = 1;
+		ft_strdel(&s->buf_static);
+		if ((r->ret = (int)read(r->clonefd, buf, BUFF_SIZE)) == 0)
+			return (1);
+		buf[r->ret] = '\0';
+		return (2);
+	}
+	ft_strcpy(s->buf_static, buf + cmpt + 1);
 	return (1);
+}
+
+int				get_next_line(const int fd, char **line)
+{
+	static	t_stat		*stat;
+	char				*buf;
+	t_ret				ret;
+
+	if ((ret.clonefd = fd) < 0 || fd > FOPEN_MAX)
+		return (-1);
+	if (stat == NULL)
+		ft_creat_list(&ret, &stat, NULL, NULL);
+	else
+		stat = ft_lst(&ret, stat, stat->save);
+	if ((buf = ft_strnew(BUFF_SIZE)) == NULL)
+		return (-1);
+	while (ret.ret == 2)
+	{
+		if (stat->buf_static != NULL && *(stat->buf_static) != '\0')
+			ft_strcpy(buf, stat->buf_static);
+		else if (ret.len_line == 0)
+		{
+			if ((ret.ret = (int)read(ret.clonefd, buf, BUFF_SIZE)) == -1)
+				return (-1);
+		}
+		ret.ret = sub_get_next_line(&ret, stat, buf, line);
+	}
+	ft_strdel(&buf);
+	return (ret.ret);
 }

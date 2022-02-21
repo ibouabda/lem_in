@@ -2,6 +2,7 @@
 # define __LEM_IN_H__
 
 # include "libft.h"
+# include "str_color.h"
 # include <stdio.h>
 
 typedef struct			s_ant
@@ -52,7 +53,7 @@ typedef struct			s_bool_parse
 }						t_bool_parse;
 
 char					parse(t_env *env);
-char					get_room(t_env *env, char *line, t_room_list *last_room,
+char					get_room(t_env *env, char *line, t_room_list **last_room,
 	t_bool_parse *bool_parse);
 char					get_pipe(t_env *env, char *line);
 char					alloc_ants(t_env *env);
